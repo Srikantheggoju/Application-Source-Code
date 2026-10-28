@@ -13,26 +13,26 @@ pipeline {
             }
         }
 
-        stage('Docker Version') {
-            steps {
-                sh 'docker --version'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $IMAGE_NAME:${BUILD_NUMBER} .'
             }
         }
-    }
 
-    post {
-        success {
-            echo 'Docker image build successful'
-        }
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
 
-        failure {
-            echo 'Build failed'
+                    sh '''
+                    docker login -u $USER -p $PASS
+                    docker push $IMAGE_NAME:${BUILD_NUMBER}
+                    '''
+                }
+            }
         }
     }
 }
