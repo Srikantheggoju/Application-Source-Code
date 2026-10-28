@@ -8,11 +8,10 @@ pipeline {
     stages {
 
         stage('Checkout') {
-            steps {
-                git branch: 'main',
-                url: 'https://github.com/Srikantheggoju/flask-app.git'
-            }
-        }
+    steps {
+        echo 'Source already checked out by Jenkins SCM'
+    }
+}
 
         stage('Build Docker Image') {
             steps {
