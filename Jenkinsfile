@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "Srikanth/flask-app"
+    }
+
     stages {
 
         stage('Checkout') {
@@ -9,28 +13,26 @@ pipeline {
             }
         }
 
-        stage('Workspace Validation') {
+        stage('Docker Version') {
             steps {
-                sh 'pwd'
-                sh 'ls -la'
+                sh 'docker --version'
             }
         }
 
-        stage('Application Validation') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Application files are available'
-                sh 'cat requirements.txt'
+                sh 'docker build -t $IMAGE_NAME:${BUILD_NUMBER} .'
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline executed successfully'
+            echo 'Docker image build successful'
         }
 
         failure {
-            echo 'Pipeline execution failed'
+            echo 'Build failed'
         }
     }
 }
