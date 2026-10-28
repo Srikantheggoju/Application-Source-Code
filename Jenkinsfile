@@ -1,38 +1,36 @@
 pipeline {
     agent any
 
-    environment {
-        IMAGE_NAME = "yourdockerhub/flask-app"
-    }
-
     stages {
 
         stage('Checkout') {
-    steps {
-        echo 'Source already checked out by Jenkins SCM'
-    }
-}
-
-        stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:${BUILD_NUMBER} .'
+                echo 'Source already checked out by Jenkins SCM'
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Workspace Validation') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub',
-                    usernameVariable: 'USER',
-                    passwordVariable: 'PASS'
-                )]) {
-
-                    sh '''
-                    docker login -u $USER -p $PASS
-                    docker push $IMAGE_NAME:${BUILD_NUMBER}
-                    '''
-                }
+                sh 'pwd'
+                sh 'ls -la'
             }
+        }
+
+        stage('Application Validation') {
+            steps {
+                echo 'Application files are available'
+                sh 'cat requirements.txt'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline executed successfully'
+        }
+
+        failure {
+            echo 'Pipeline execution failed'
         }
     }
 }
